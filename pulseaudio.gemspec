@@ -5,13 +5,15 @@
 
 Gem::Specification.new do |s|
   s.name = %q{pulseaudio}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kasper Johansen"]
   s.date = %q{2012-05-21}
+  s.default_executable = %q{pulseaudio_volume.rb}
   s.description = %q{Ruby-library for controlling PulseAudio via 'pactl'.}
   s.email = %q{k@spernj.org}
+  s.executables = ["pulseaudio_volume.rb"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -25,7 +27,9 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "bin/pulseaudio_volume.rb",
     "lib/pulseaudio.rb",
+    "pulseaudio.gemspec",
     "spec/pulseaudio_spec.rb",
     "spec/spec_helper.rb"
   ]
