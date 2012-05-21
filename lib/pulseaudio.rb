@@ -47,7 +47,11 @@ class PulseAudio
         end
       end
       
-      return sinks if !block_given?
+      if block_given?
+        return nil
+      else
+        return sinks
+      end
     end
     
     def update(args)
