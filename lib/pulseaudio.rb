@@ -54,6 +54,7 @@ class PulseAudio
       end
     end
     
+    #Updates the data on the object. This should not be called.
     def update(args)
       @args = args
     end
