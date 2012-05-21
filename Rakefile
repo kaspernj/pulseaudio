@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "pulseaudio"
   gem.homepage = "http://github.com/kaspernj/pulseaudio"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Ruby-library for controlling PulseAudio.}
+  gem.description = %Q{Ruby-library for controlling PulseAudio via 'pactl'.}
   gem.email = "k@spernj.org"
   gem.authors = ["Kasper Johansen"]
   # dependencies defined in Gemfile
