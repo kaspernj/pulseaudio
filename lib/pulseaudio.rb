@@ -1,5 +1,14 @@
 #A framework for controlling various elements of PulseAudio in Ruby.
 class PulseAudio
+  #Subclass for gui elements.
+  class Gui
+    #Autoloader for subclasses.
+    def self.const_missing(name)
+      require "#{File.dirname(__FILE__)}/../gui/#{name.to_s.downcase}/#{name.to_s.downcase}.rb"
+      return PulseAudio::Gui.const_get(name)
+    end
+  end
+  
   #Class for controlling sinks. The sinks on the sytem can be gotten by running the list-method.
   #===Examples
   # sinks = PulseAudio::Sink.list
@@ -119,6 +128,14 @@ class PulseAudio
     def vol_decr
       %x[pactl set-sink-volume #{self.sink_id} -- -5%]
       PulseAudio::Sink.list #reload info.
+      return nil
+    end
+    
+    #Sets this sink to be the default one.
+    #===Examples
+    # sink.default!
+    def default!
+      %x[pacmd set-default-sink #{self.sink_id}]
       return nil
     end
   end
