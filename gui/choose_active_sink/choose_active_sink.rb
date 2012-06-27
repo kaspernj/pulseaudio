@@ -17,6 +17,8 @@ class PulseAudio::Gui::Choose_active_sink
     @ui["tvSources"].columns[0].visible = false
     self.reload_sources
     
+    PulseAudio::Sink::Input.auto_redirect_new_inputs_to_default_sink
+    
     @ui["window"].show_all
   end
   

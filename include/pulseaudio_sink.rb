@@ -10,6 +10,15 @@ class PulseAudio::Sink
   
   @@sinks = Wref_map.new
   
+  #Used to look up IDs from names (like when getting default sink).
+  @@sink_name_to_id_ref = {}
+  
+  #Autoloader for subclasses.
+  def self.const_missing(name)
+    require "#{File.realpath(File.dirname(__FILE__))}/pulseaudio_sink_#{name.to_s.downcase}.rb"
+    return PulseAudio::Sink.const_get(name)
+  end
+  
   #Returns a list of sinks on the system. It also reloads information for all sinks if the information has been changed.
   #===Examples
   # sinks = PulseAudio::Sink.list
@@ -33,6 +42,7 @@ class PulseAudio::Sink
       if !sink
         sink = PulseAudio::Sink.new
         @@sinks[sink_id] = sink
+        @@sink_name_to_id_ref[props["name"]] = sink_id
       end
       
       sink.update(args)
@@ -49,6 +59,33 @@ class PulseAudio::Sink
     else
       return sinks
     end
+  end
+  
+  #Returns the default sink by doing a smart lookup and using the 'name-to-id-ref'-cache.
+  def self.by_default
+    def_str = %x[pacmd info | grep "Default sink name"]
+    raise "Could not match default sink." if !match = def_str.match(/^Default sink name: (.+?)\s*$/)
+    sink_id = @@sink_name_to_id_ref[match[1]]
+    raise "Could not figure out sink-ID." if !sink_id
+    return PulseAudio::Sink.by_id(sink_id.to_i)
+  end
+  
+  #Returns a sink by its sink-ID.
+  #===Examples
+  # sink = PulseAudio::Sink.by_id(3)
+  def self.by_id(id)
+    #Return it from the weak-reference-map, if it already exists there.
+    if sink = @@sinks.get!(id)
+      return sink
+    end
+    
+    #Read the sinks one-by-one and return it when found.
+    PulseAudio::Sink.list do |sink|
+      return sink if sink.sink_id == id
+    end
+    
+    #Sink could not be found by the given ID - raise error.
+    raise NameError, "No sink by that ID: '#{id}' (#{id.class.name})."
   end
   
   #Updates the data on the object. This should not be called.

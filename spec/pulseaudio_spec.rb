@@ -9,4 +9,17 @@ describe "Pulseaudio" do
       sink.mute_toggle
     end
   end
+  
+  it "should be able to listen for events and redirect all new inputs to the default sink" do
+    def_sink = nil
+    PulseAudio::Sink.list do |sink|
+      if sink.default?
+        def_sink = sink
+        break
+      end
+    end
+    
+    PulseAudio::Sink::Input.auto_redirect_new_inputs_to_default_sink
+    PulseAudio::Events.instance.join
+  end
 end
