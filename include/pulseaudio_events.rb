@@ -60,7 +60,6 @@ class PulseAudio::Events
   end
   
   def destroy
-    print "Destroy called!\n"
     @args = nil
     @connects = nil
     Process.kill("HUP", @pid) if @pid
