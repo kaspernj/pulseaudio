@@ -18,6 +18,7 @@ class PulseAudio::Gui::Choose_active_sink
     self.reload_sources
     
     PulseAudio::Sink::Input.auto_redirect_new_inputs_to_default_sink
+    PulseAudio::Source::Output.auto_redirect_new_outputs_to_default_source
     
     @ui["window"].show_all
   end
