@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{pulseaudio}
-  s.version = "0.0.3"
+  s.version = "0.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kasper Johansen"]
-  s.date = %q{2012-06-07}
+  s.date = %q{2012-06-27}
   s.default_executable = %q{pulseaudio_volume.rb}
   s.description = %q{Ruby-library for controlling PulseAudio via 'pactl'.}
   s.email = %q{k@spernj.org}
@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
     "bin/pulseaudio_volume.rb",
     "gui/choose_active_sink/choose_active_sink.glade",
     "gui/choose_active_sink/choose_active_sink.rb",
+    "include/pulseaudio_events.rb",
     "include/pulseaudio_gui.rb",
     "include/pulseaudio_sink.rb",
     "include/pulseaudio_sink_input.rb",
