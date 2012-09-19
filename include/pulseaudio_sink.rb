@@ -156,6 +156,15 @@ class PulseAudio::Sink
     return nil
   end
   
+  #Returns the current percent of the volume.
+  def vol_perc
+    if match = @args[:props]["volume"].to_s.match(/(\d+):\s*(\d+)%/)
+      return match[2].to_i
+    end
+    
+    raise "Could not figure out the volume."
+  end
+  
   #Returns true if this sink is the default one.
   def default?
     def_str = %x[pacmd info | grep "Default sink name"]

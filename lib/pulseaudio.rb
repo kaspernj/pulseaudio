@@ -1,4 +1,4 @@
-require "wref"
+require "wref" if !Kernel.const_defined?(:Wref)
 
 #A framework for controlling various elements of PulseAudio in Ruby.
 class PulseAudio
