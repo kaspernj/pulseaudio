@@ -10,7 +10,7 @@ require "/home/kaspernj/Dev/Ruby/Gems/knjrbfw/lib/knjrbfw.rb"
 require "gettext"
 Knj.gem_require(:Gtk3assist, "gtk3assist")
 
-Gtk3assist.enable_threadding
+Gtk3assist::Threadding.enable_threadding
 
 def _(str)
   return GetText._(str)
