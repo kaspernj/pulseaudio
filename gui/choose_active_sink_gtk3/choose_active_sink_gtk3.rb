@@ -196,21 +196,25 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
   end
   
   def on_tvSources_cursor_changed(*args)
-    return nil if @reloading or !@tv_sources
-    sel = @tv_sources.sel
-    return nil if !sel
-    
-    source = nil
-    PulseAudio::Source.list do |source_i|
-      if source_i.source_id.to_i == sel[:data][:id].to_i
-        source = source_i
-        break
+    begin
+      return nil if @reloading or !@tv_sources
+      sel = @tv_sources.sel
+      return nil if !sel
+      
+      source = nil
+      PulseAudio::Source.list do |source_i|
+        if source_i.source_id.to_i == sel[:data][:id].to_i
+          source = source_i
+          break
+        end
       end
+      
+      raise "Could not find source." if !source
+      source.default!
+      self.update_icon
+    rescue => e
+      Gtk3assist::Msgbox.error(e)
     end
-    
-    raise "Could not find source." if !source
-    source.default!
-    self.update_icon
   end
   
   def on_window_delete_event(*args)
