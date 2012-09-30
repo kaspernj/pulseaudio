@@ -1,4 +1,4 @@
-#Subclass for gui elements.
+#Subclass for GUI elements.
 class PulseAudio::Gui
   #Autoloader for subclasses.
   def self.const_missing(name)

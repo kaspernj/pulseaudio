@@ -1,13 +1,19 @@
 #!/usr/bin/env ruby
 
-Dir.chdir(File.dirname(__FILE__))
-require "../lib/pulseaudio.rb"
+require "#{File.realpath(File.dirname(__FILE__))}/../lib/pulseaudio.rb"
 
 require "rubygems"
 require "gir_ffi"
 require "gir_ffi-gtk3"
-require "/home/kaspernj/Dev/Ruby/Gems/knjrbfw/lib/knjrbfw.rb"
 require "gettext"
+
+#Try to load development-version of 'knjrbfw'.
+begin
+  require "#{File.realpath(File.dirname(__FILE__))}/../../knjrbfw/lib/knjrbfw.rb"
+rescue LoadError
+  require "knjrbfw"
+end
+
 Knj.gem_require(:Gtk3assist, "gtk3assist")
 
 Gtk3assist::Threadding.enable_threadding

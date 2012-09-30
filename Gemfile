@@ -7,6 +7,7 @@ gem "wref"
 gem "gir_ffi"
 gem "gtk3assist"
 gem "gettext"
+gem "knjrbfw"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
