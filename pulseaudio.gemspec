@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "pulseaudio"
-  s.version = "0.0.5"
+  s.version = "0.0.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kasper Johansen"]
-  s.date = "2012-09-19"
+  s.date = "2012-09-30"
   s.description = "Ruby-library for controlling PulseAudio via 'pactl'."
   s.email = "k@spernj.org"
   s.executables = ["pulseaudio_volume.rb"]
@@ -63,6 +63,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<gir_ffi>, [">= 0"])
       s.add_runtime_dependency(%q<gtk3assist>, [">= 0"])
       s.add_runtime_dependency(%q<gettext>, [">= 0"])
+      s.add_runtime_dependency(%q<knjrbfw>, [">= 0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, [">= 1.0.0"])
@@ -72,6 +73,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<gir_ffi>, [">= 0"])
       s.add_dependency(%q<gtk3assist>, [">= 0"])
       s.add_dependency(%q<gettext>, [">= 0"])
+      s.add_dependency(%q<knjrbfw>, [">= 0"])
       s.add_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, [">= 1.0.0"])
@@ -82,6 +84,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<gir_ffi>, [">= 0"])
     s.add_dependency(%q<gtk3assist>, [">= 0"])
     s.add_dependency(%q<gettext>, [">= 0"])
+    s.add_dependency(%q<knjrbfw>, [">= 0"])
     s.add_dependency(%q<rspec>, ["~> 2.8.0"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<bundler>, [">= 1.0.0"])
