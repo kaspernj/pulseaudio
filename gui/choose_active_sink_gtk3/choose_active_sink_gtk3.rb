@@ -44,6 +44,14 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
     self.update_icon
   end
   
+  #Called when the window-state is changed to close window instead of minimize.
+  def on_window_window_state_event(win, win_state)
+    if win_state.new_window_state == 130
+      @ui["window"].hide
+      @ui["window"].deiconify
+    end
+  end
+  
   #Called when something is removed from PulseAudio. Removes items from the treeviews automatically.
   def on_remove(args)
     event, ele, ele_id = args[:args][:event].to_sym, args[:args][:element].to_s, args[:args][:element_id].to_i
