@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "pulseaudio"
-  s.version = "0.0.6"
+  s.version = "0.0.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kasper Johansen"]
-  s.date = "2012-09-30"
+  s.date = "2012-10-03"
   s.description = "Ruby-library for controlling PulseAudio via 'pactl'."
   s.email = "k@spernj.org"
   s.executables = ["pulseaudio_volume.rb"]
