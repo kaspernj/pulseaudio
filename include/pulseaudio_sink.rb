@@ -70,6 +70,18 @@ class PulseAudio::Sink
     return PulseAudio::Sink.by_id(sink_id.to_i)
   end
   
+  #This automatically reloads a sink when a 'change'-event appears.
+  PulseAudio::Events.instance.connect(:event => :change, :element => "sink") do |args|
+    if @@sinks.key?(args[:args][:element_id]) and sink = @@sinks.get(args[:args][:element_id])
+      sink.reload
+    end
+  end
+  
+  #Reloads the information on the sink.
+  def reload
+    PulseAudio::Sink.list #Reloads information on all sinks.
+  end
+  
   #Returns a sink by its sink-ID.
   #===Examples
   # sink = PulseAudio::Sink.by_id(3)
@@ -134,7 +146,6 @@ class PulseAudio::Sink
       %x[pactl set-sink-mute #{self.sink_id} 0]
     end
     
-    PulseAudio::Sink.list #reload info.
     return nil
   end
   
@@ -143,7 +154,6 @@ class PulseAudio::Sink
   # sink.vol_incr if sink.active? #=> nil
   def vol_incr
     %x[pactl set-sink-volume #{self.sink_id} -- +5%]
-    PulseAudio::Sink.list #reload info.
     return nil
   end
   
@@ -152,7 +162,11 @@ class PulseAudio::Sink
   # sink.vol_decr if sink.active? #=> nil
   def vol_decr
     %x[pactl set-sink-volume #{self.sink_id} -- -5%]
-    PulseAudio::Sink.list #reload info.
+    return nil
+  end
+  
+  def vol_perc=(newval)
+    %x[pactl set-sink-volume #{self.sink_id} #{newval.to_i}%]
     return nil
   end
   
@@ -176,6 +190,7 @@ class PulseAudio::Sink
   #===Examples
   # sink.default!
   def default!
+    #Set all inputs to the this sink.
     PulseAudio::Sink::Input.list do |input|
       input.sink = self
     end

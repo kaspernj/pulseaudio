@@ -36,12 +36,15 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
     events = PulseAudio::Events.instance
     events.connect(:event => :remove, &self.method(:on_remove))
     events.connect(:event => :new, &self.method(:on_new))
+    events.connect(:event => :change, &self.method(:on_change))
     
     @sicon = Gtk::StatusIcon.new
     @sicon.signal_connect("activate", &self.method(:on_sicon_activate))
     @sicon.signal_connect("popup-menu", &self.method(:on_sicon_popupmenu))
     @sicon.signal_connect("scroll-event", &self.method(:on_sicon_scroll))
     self.update_icon
+    self.update_sink_info
+    self.update_source_info
   end
   
   #Called when the window-state is changed to close window instead of minimize.
@@ -88,15 +91,27 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
     end
   end
   
+  #Called when something is changed. Updates mute-toggle-values, adjustment-values and more automatically.
+  def on_change(args)
+    event, ele, ele_id = args[:args][:event].to_sym, args[:args][:element].to_s, args[:args][:element_id].to_i
+    
+    if ele == "sink"
+      self.update_sink_info
+    elsif ele == "source"
+      self.update_source_info
+    else
+      return nil
+    end
+  end
+  
   #Updates the statusicons icon based on the current sinks volume.
   def update_icon
     #Get the current active sink which should be manipulated.
-    sink_def = PulseAudio::Sink.by_default
-    return nil if !sink_def
+    return nil if !@sink
     
     
     #Evaluate which icon is the closest to the current volume.
-    vol_perc = sink_def.vol_perc
+    vol_perc = @sink.vol_perc
     levels = [0, 33, 66, 100]
     
     vol_closest = levels.first
@@ -115,6 +130,52 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
     @sicon.set_from_file(icon_filepath)
   end
   
+  def update_sink_info
+    if @sink.muted?
+      @ui["cbSinkMute"].active = true
+    else
+      @ui["cbSinkMute"].active = false
+    end
+    
+    @ui["adjustmentSinkVolume"].value = @sink.vol_perc.to_f
+  end
+  
+  def update_source_info
+    if @source.muted?
+      @ui["cbSourceMute"].active = true
+    else
+      @ui["cbSourceMute"].active = false
+    end
+    
+    @ui["adjustmentSourceVolume"].value = @source.vol_perc.to_f
+  end
+  
+  def on_hscaleSinkVolume_change_value
+    GLib.source_remove(@timeout_sink_volume_change) if @timeout_sink_volume_change
+    
+    @timeout_sink_volume_change = GLib.timeout_add(GLib::PRIORITY_DEFAULT_IDLE, 50, proc{
+      @timeout_sink_volume_change = nil
+      @sink.vol_perc = @ui["adjustmentSinkVolume"].value
+    }, nil, nil)
+  end
+  
+  def on_hscaleSourceVolume_change_value
+    GLib.source_remove(@timeout_source_volume_change) if @timeout_source_volume_change
+    
+    @timeout_source_volume_change = GLib.timeout_add(GLib::PRIORITY_DEFAULT_IDLE, 50, proc{
+      @timeout_source_volume_change = nil
+      @source.vol_perc = @ui["adjustmentSourceVolume"].value
+    }, nil, nil)
+  end
+  
+  def on_cbSinkMute_toggled
+    @sink.mute = @ui["cbSinkMute"].active
+  end
+  
+  def on_cbSourceMute_toggled
+    @source.mute = @ui["cbSourceMute"].active
+  end
+  
   def on_sicon_activate(*args)
     if !@ui["window"].get_visible
       @ui["window"].show_all
@@ -126,12 +187,11 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
   def on_sicon_scroll(sicon, scroll_e, temp)
     direction = scroll_e.direction.to_s
     return nil if direction == "smooth"
-    sink_def = PulseAudio::Sink.by_default
     
     if direction == "up"
-      sink_def.vol_incr
+      @sink.vol_incr
     elsif direction == "down"
-      sink_def.vol_decr
+      @sink.vol_decr
     end
     
     self.update_icon
@@ -154,6 +214,7 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
       
       if sink.default?
         @ui["tvSinks"].selection.select_iter(append_data[:iter])
+        @sink = sink
       end
     end
     
@@ -174,6 +235,7 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
       
       if source.default?
         @ui["tvSources"].selection.select_iter(append_data[:iter])
+        @source = source
       end
     end
     
@@ -185,7 +247,6 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
       return nil if @reloading or !@tv_sinks
       sel = @tv_sinks.sel
       return nil if !sel
-      puts sel
       
       sink = nil
       PulseAudio::Sink.list do |sink_i|
@@ -196,8 +257,10 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
       end
       
       raise "Could not find sink." if !sink
+      @sink = sink
       sink.default!
       self.update_icon
+      self.update_sink_info
     rescue => e
       Gtk3assist::Msgbox.error(e)
     end
@@ -218,8 +281,10 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
       end
       
       raise "Could not find source." if !source
+      @source = source
       source.default!
       self.update_icon
+      self.update_source_info
     rescue => e
       Gtk3assist::Msgbox.error(e)
     end
