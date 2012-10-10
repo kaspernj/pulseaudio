@@ -50,9 +50,9 @@ class PulseAudio::Sink::Input
         input = PulseAudio::Sink::Input.new
         @@inputs[input_id] = input
       end
-      
+
       input.update(args)
-      
+
       if block_given?
         yield(input)
       else
@@ -155,6 +155,7 @@ class PulseAudio::Sink::Input
   
   def vol_perc=(newval)
     %x[pactl set-sink-input-volume #{self.input_id} #{newval.to_i}%]
+    @args[:props]["volume"] = "0:  #{newval}% 1:  #{newval}%"
     return nil
   end
   
