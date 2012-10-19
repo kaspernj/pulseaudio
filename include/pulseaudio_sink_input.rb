@@ -1,5 +1,8 @@
 #Class for controlling inputs.
 class PulseAudio::Sink::Input
+  #The arguments-hash. Contains various data for the input.
+  attr_reader :args
+  
   @@inputs = Wref_map.new
   
   #Starts automatically redirect new opened inputs to the default sink.
@@ -90,6 +93,15 @@ class PulseAudio::Sink::Input
     @args = args
   end
   
+  #Returns the name of the input as a string.
+  def name
+    if app_name = @args[:props]["application_name"].to_s.strip and !app_name.empty?
+      return app_name
+    else
+      raise "Could not figure out the input-name."
+    end
+  end
+  
   #Returns the input-ID.
   def input_id
     return @args[:input_id]
@@ -154,18 +166,19 @@ class PulseAudio::Sink::Input
   end
   
   def vol_perc=(newval)
-    %x[pactl set-sink-input-volume #{self.input_id} #{newval.to_i}%]
+    newval = newval.to_i
+    %x[pactl set-sink-input-volume #{self.input_id} #{newval}%]
     @args[:props]["volume"] = "0:  #{newval}% 1:  #{newval}%"
     return nil
   end
   
   #Returns the current percent of the volume.
   def vol_perc
-    if match = @args[:props]["volume"].to_s.match(/(\d+):\s*(\d+)%/)
+    if match = @args[:props]["volume"].to_s.match(/(\d+):\s*([\d\.]+)%/)
       return match[2].to_i
     end
     
-    raise "Could not figure out the volume."
+    raise "Could not figure out the volume from properties: '#{@args[:props]}'."
   end
 
   def method_missing(meth, *args, &block)

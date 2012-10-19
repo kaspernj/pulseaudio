@@ -30,6 +30,22 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
     @ui["tvSources"].get_column(0).visible = false
     self.reload_sources
     
+    @tv_applications = Gtk3assist::Treeview.new(
+      :tv => @ui["tvApplications"],
+      :model => :liststore,
+      :sort_col => :name,
+      :cols => [
+        {:id => :id, :title => _("ID")},
+        {:id => :name, :title => _("Name")}
+      ]
+    )
+    @ui["tvApplications"].get_column(0).visible = false
+    @ui["tvApplications"].selection.signal_connect("changed", &self.method(:on_tvApplications_selection_changed))
+    
+    self.reload_applications
+    self.update_application_info
+    @ui["frameApplicationSettings"].hide
+    
     PulseAudio::Sink::Input.auto_redirect_new_inputs_to_default_sink
     PulseAudio::Source::Output.auto_redirect_new_outputs_to_default_source
     
@@ -150,6 +166,11 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
     @ui["adjustmentSourceVolume"].value = @source.vol_perc.to_f
   end
   
+  def update_application_info
+    return nil if !@input
+    @ui["adjustmentApplicationVolume"].value = @input.vol_perc.to_f
+  end
+  
   def on_hscaleSinkVolume_change_value
     GLib.source_remove(@timeout_sink_volume_change) if @timeout_sink_volume_change
     
@@ -178,7 +199,7 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
   
   def on_sicon_activate(*args)
     if !@ui["window"].get_visible
-      @ui["window"].show_all
+      @ui["window"].show
     else
       @ui["window"].hide
     end
@@ -272,22 +293,60 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
       sel = @tv_sources.sel
       return nil if !sel
       
-      source = nil
-      PulseAudio::Source.list do |source_i|
-        if source_i.source_id.to_i == sel[:data][:id].to_i
-          source = source_i
-          break
-        end
-      end
-      
-      raise "Could not find source." if !source
-      @source = source
-      source.default!
+      @source = PulseAudio::Source.by_id(sel[:data][:id].to_i)
+      @source.default!
       self.update_icon
       self.update_source_info
     rescue => e
       Gtk3assist::Msgbox.error(e)
     end
+  end
+  
+  def add_input(input)
+    append_data = @tv_applications.add_row(:data => {:id => input.input_id, :name => input.name})
+    return append_data
+  end
+  
+  def reload_applications
+    begin
+      @reloading = true
+      
+      @tv_applications.model.clear
+      PulseAudio::Sink::Input.list do |input|
+        append_data = self.add_input(input)
+      end
+    ensure
+      @reloading = false
+    end
+  end
+  
+  def on_tvApplications_selection_changed(*args)
+    begin
+      return nil if @reloading or !@tv_applications
+      sel = @tv_applications.sel
+      
+      if !sel
+        @ui["frameApplicationSettings"].hide
+        @input = nil
+      else
+        @ui["frameApplicationSettings"].show
+        @input = PulseAudio::Sink::Input.by_id(sel[:data][:id].to_i)
+        self.update_application_info
+      end
+    rescue => e
+      raise e
+    end
+  end
+  
+  def on_hscaleApplicationVolume_change_value
+    return nil if !@input
+    GLib.source_remove(@timeout_input_volume_change) if @timeout_input_volume_change
+    
+    @timeout_input_volume_change = GLib.timeout_add(GLib::PRIORITY_DEFAULT_IDLE, 50, proc{
+      @timeout_input_volume_change = nil
+      @input.vol_perc = @ui["adjustmentApplicationVolume"].value
+      false
+    }, nil, nil)
   end
   
   def on_window_delete_event(*args)
