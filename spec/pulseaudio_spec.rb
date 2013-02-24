@@ -29,6 +29,14 @@ describe "Pulseaudio" do
     end
     
     PulseAudio::Sink::Input.auto_redirect_new_inputs_to_default_sink
-    PulseAudio::Events.instance.join
+    
+    require "timeout"
+    begin
+      Timeout.timeout(0.1) do
+        PulseAudio::Events.instance.join
+      end
+    rescue Timeout::Error
+      #expected.
+    end
   end
 end
