@@ -146,14 +146,30 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
     @sicon.set_from_file(icon_filepath)
   end
   
-  def update_sink_info
-    if @sink.muted?
-      @ui["cbSinkMute"].active = true
-    else
-      @ui["cbSinkMute"].active = false
-    end
+  #Runs the given block and doesnt toggle the mute-functionality while it runs.
+  def no_mute_toggle
+    @no_toggle_event_count = 0 if @no_toggle_event_count == nil
+    @no_toggle_event_count += 1
     
-    @ui["adjustmentSinkVolume"].value = @sink.vol_perc.to_f
+    begin
+      yield
+    ensure
+      @no_toggle_event_count -= 1
+    end
+  end
+  
+  def update_sink_info
+    self.no_mute_toggle do
+      if @sink.muted?
+        puts "Mute is active - set."
+        @ui["cbSinkMute"].active = true
+      else
+        puts "Mute is not active - unset."
+        @ui["cbSinkMute"].active = false
+      end
+      
+      @ui["adjustmentSinkVolume"].value = @sink.vol_perc.to_f
+    end
   end
   
   def update_source_info
@@ -190,7 +206,10 @@ class PulseAudio::Gui::Choose_active_sink_gtk3
   end
   
   def on_cbSinkMute_toggled
-    @sink.mute = @ui["cbSinkMute"].active
+    if !@no_toggle_event
+      puts "Mute toggle."
+      @sink.mute = @ui["cbSinkMute"].active
+    end
   end
   
   def on_cbSourceMute_toggled

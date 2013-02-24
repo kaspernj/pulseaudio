@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby1.9
 
 require "rubygems"
-require "pulseaudio"
+require "#{File.dirname(__FILE__)}/../lib/pulseaudio.rb"
 
 sinks = PulseAudio::Sink.list
 
@@ -18,4 +18,6 @@ elsif ARGV[0] == "mute"
   sinks.each do |sink|
     sink.mute_toggle if sink.active?
   end
+else
+  puts "Dont know what to do with argument: '#{ARGV[0]}'."
 end

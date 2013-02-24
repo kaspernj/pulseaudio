@@ -76,7 +76,7 @@ class PulseAudio::Source
   
   #This automatically reloads a source when a 'change'-event appears.
   PulseAudio::Events.instance.connect(:event => :change, :element => "source") do |args|
-    if @@sources.key?(args[:args][:element_id]) and source = @@sources.get(args[:args][:element_id])
+    if @@sources.key?(args[:args][:element_id]) and source = @@sources.get!(args[:args][:element_id])
       source.reload
     end
   end

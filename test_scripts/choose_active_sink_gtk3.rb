@@ -1,5 +1,15 @@
 #!/usr/bin/env ruby
 
+#Try to load development-version of 'knjrbfw'.
+begin
+  require "#{File.realpath(File.dirname(__FILE__))}/../../knjrbfw/lib/knjrbfw.rb"
+  puts "Loaded custom knjrbfw."
+rescue LoadError
+  require "knjrbfw"
+end
+
+Knj.gem_require([:wref, :gtk3assist, :autogc])
+
 require "#{File.realpath(File.dirname(__FILE__))}/../lib/pulseaudio.rb"
 
 require "rubygems"
@@ -7,17 +17,13 @@ require "gir_ffi"
 require "gir_ffi-gtk3"
 require "gettext"
 
-#Try to load development-version of 'knjrbfw'.
-begin
-  require "#{File.realpath(File.dirname(__FILE__))}/../../knjrbfw/lib/knjrbfw.rb"
-rescue LoadError
-  require "knjrbfw"
-end
+#Solves memory corruption problem in Ruby 1.9.3.
+Autogc.enable_for_known_buggy_env
 
-Knj.gem_require(:Gtk3assist, "gtk3assist")
+#Solves threadding issues with Gir-GTK and MRI Ruby.
+Gtk3assist::Threadding.enable_threadding_if_necessary
 
-Gtk3assist::Threadding.enable_threadding
-
+#Shortcut for GetText.
 def _(str)
   return GetText._(str)
 end

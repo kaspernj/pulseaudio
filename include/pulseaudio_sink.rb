@@ -72,7 +72,7 @@ class PulseAudio::Sink
   
   #This automatically reloads a sink when a 'change'-event appears.
   PulseAudio::Events.instance.connect(:event => :change, :element => "sink") do |args|
-    if @@sinks.key?(args[:args][:element_id]) and sink = @@sinks.get(args[:args][:element_id])
+    if @@sinks.key?(args[:args][:element_id]) and sink = @@sinks.get!(args[:args][:element_id])
       sink.reload
     end
   end
