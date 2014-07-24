@@ -3,6 +3,7 @@ rvm:
   - 2.0.0
 before_install:
   - sudo apt-get install -y pulseaudio pulseaudio-utils
+  - sudo service pulseaudio restart
 script:
   - CODECLIMATE_REPO_TOKEN=55cdec553f235911adfd1b0e92f042c02376beed71b31084d57fcbb0d442daa8 bundle exec rspec
 notifications:
