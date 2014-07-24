@@ -1,3 +1,7 @@
+[![Code Climate](https://codeclimate.com/github/kaspernj/pulseaudio.png)](https://codeclimate.com/github/kaspernj/pulseaudio)
+[![Test Coverage](https://codeclimate.com/github/kaspernj/pulseaudio/coverage.png)](https://codeclimate.com/github/kaspernj/pulseaudio)
+[![Build Status](https://api.shippable.com/projects/53d1121029a3449800e640f5/badge/master)](https://www.shippable.com/projects/53d1121029a3449800e640f5)
+
 # pulseaudio
 
 Manipulate sound settings through this library written in Ruby.
