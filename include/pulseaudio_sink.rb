@@ -31,13 +31,21 @@ class PulseAudio::Sink
 
     list.scan(/(\n|^)Sink #(\d+)\s+([\s\S]+?)Formats:\s+(.+?)\n/) do |match|
       props = {}
+
       match[2].scan(/(\t|^)([A-z]+?): (.+?)\n/) do |match_prop|
         props[match_prop[1].downcase] = match_prop[2]
       end
 
+      internal_props = {}
+      sink_internal_properties = match[2].scan(/Properties:\n(?:.+=.+\n)+/).first
+      sink_internal_properties.scan(/\t([A-z]+(?:\.[A-z]+)+) = "(.+?)"\n/) do |match_prop|
+        internal_props[match_prop[0].downcase] = match_prop[1]
+      end
+
+      props["internal_props"] = internal_props
+
       sink_id = match[1].to_i
       args = {:sink_id => sink_id, :props => props}
-
       sink = @@sinks.get!(sink_id)
       if !sink
         sink = PulseAudio::Sink.new
