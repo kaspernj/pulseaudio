@@ -4,11 +4,11 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem "autogc"
-gem "wref"
+gem "wref", ">= 0.0.8"
 gem "gir_ffi"
 gem "gtk3assist"
 gem "gettext"
-gem "knjrbfw"
+gem "knjrbfw", ">= 0.0.113"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

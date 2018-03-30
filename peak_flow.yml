@@ -1,0 +1,4 @@
+before_script:
+  - sudo apt-get install -y pulseaudio pulseaudio-utils
+script:
+  - bundle exec rspec
