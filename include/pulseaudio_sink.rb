@@ -8,7 +8,7 @@ class PulseAudio::Sink
   #The arguments-hash. Contains various data for the sink.
   attr_reader :args
   
-  @@sinks = Wref_map.new
+  @@sinks = Wref::Map.new
   
   #Used to look up IDs from names (like when getting default sink).
   @@sink_name_to_id_ref = {}
@@ -47,7 +47,7 @@ class PulseAudio::Sink
       sink_id = match[1].to_i
       args = {:sink_id => sink_id, :props => props}
       
-      sink = @@sinks.get!(sink_id)
+      sink = @@sinks[sink_id]
       if !sink
         sink = PulseAudio::Sink.new
         @@sinks[sink_id] = sink
@@ -81,7 +81,7 @@ class PulseAudio::Sink
   
   #This automatically reloads a sink when a 'change'-event appears.
   PulseAudio::Events.instance.connect(:event => :change, :element => "sink") do |args|
-    if @@sinks.key?(args[:args][:element_id]) and sink = @@sinks.get!(args[:args][:element_id])
+    if @@sinks.key?(args[:args][:element_id]) and sink = @@sinks[args[:args][:element_id]]
       sink.reload
     end
   end
@@ -96,7 +96,7 @@ class PulseAudio::Sink
   # sink = PulseAudio::Sink.by_id(3)
   def self.by_id(id)
     #Return it from the weak-reference-map, if it already exists there.
-    if sink = @@sinks.get!(id)
+    if sink = @@sinks[id]
       return sink
     end
     

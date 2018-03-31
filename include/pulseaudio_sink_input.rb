@@ -3,7 +3,7 @@ class PulseAudio::Sink::Input
   #The arguments-hash. Contains various data for the input.
   attr_reader :args
   
-  @@inputs = Wref_map.new
+  @@inputs = Wref::Map.new
   
   #Starts automatically redirect new opened inputs to the default sink.
   #===Examples
@@ -48,7 +48,7 @@ class PulseAudio::Sink::Input
       input_id = match[1].to_i
       args = {:input_id => input_id, :props => props}
 
-      input = @@inputs.get!(input_id)
+      input = @@inputs[input_id]
       if !input
         input = PulseAudio::Sink::Input.new
         @@inputs[input_id] = input
@@ -75,7 +75,7 @@ class PulseAudio::Sink::Input
   # sink_input = PulseAudio::Sink::Input.by_id(53)
   def self.by_id(id)
     #Return it from the weak-reference-map, if it already exists there.
-    if input = @@inputs.get!(id)
+    if input = @@inputs[id]
       return input
     end
     

@@ -1,6 +1,6 @@
 #Class for controlling outputs.
 class PulseAudio::Source::Output
-  @@outputs = Wref_map.new
+  @@outputs = Wref::Map.new
   
   #Starts automatically redirect new opened outputs to the default source.
   #===Examples
@@ -37,7 +37,7 @@ class PulseAudio::Source::Output
       output_id = match[0].to_i
       args = {:output_id => output_id}
       
-      output = @@outputs.get!(output_id)
+      output = @@outputs[output_id]
       if !output
         output = PulseAudio::Source::Output.new
         @@outputs[output_id] = output

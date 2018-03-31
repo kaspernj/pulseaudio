@@ -2,7 +2,7 @@ class PulseAudio::Source
   #The arguments-hash. Contains various data for the source.
   attr_reader :args
   
-  @@sources = Wref_map.new
+  @@sources = Wref::Map.new
   @@sources_name_to_id_ref = {}
   
   #Autoloader for subclasses.
@@ -24,7 +24,7 @@ class PulseAudio::Source
       source_id = match[1].to_i
       args = {:source_id => source_id, :props => props}
       
-      source = @@sources.get!(source_id)
+      source = @@sources[source_id]
       if !source
         source = PulseAudio::Source.new
         @@sources[source_id] = source
@@ -61,7 +61,7 @@ class PulseAudio::Source
   # source = PulseAudio::Source.by_id(3)
   def self.by_id(id)
     #Return it from the weak-reference-map, if it already exists there.
-    if source = @@sources.get!(id)
+    if source = @@sources[id]
       return source
     end
     
@@ -76,7 +76,7 @@ class PulseAudio::Source
   
   #This automatically reloads a source when a 'change'-event appears.
   PulseAudio::Events.instance.connect(:event => :change, :element => "source") do |args|
-    if @@sources.key?(args[:args][:element_id]) and source = @@sources.get!(args[:args][:element_id])
+    if @@sources.key?(args[:args][:element_id]) and source = @@sources[args[:args][:element_id]]
       source.reload
     end
   end
