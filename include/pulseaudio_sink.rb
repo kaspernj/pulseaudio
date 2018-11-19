@@ -162,7 +162,7 @@ class PulseAudio::Sink
   #===Examples
   # sink.vol_incr if sink.active? #=> nil
   def vol_incr
-    %x[pactl set-sink-volume #{self.sink_id} -- +5%]
+    %x[pactl set-sink-volume #{self.sink_id} +5%]
     return nil
   end
   
@@ -170,7 +170,7 @@ class PulseAudio::Sink
   #===Examples
   # sink.vol_decr if sink.active? #=> nil
   def vol_decr
-    %x[pactl set-sink-volume #{self.sink_id} -- -5%]
+    %x[pactl set-sink-volume #{self.sink_id} -5%]
     return nil
   end
   
